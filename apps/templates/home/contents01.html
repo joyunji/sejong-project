@@ -1,0 +1,307 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Dropdowns {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        <style>
+            @import url('https://cdn.rawgit.com/moonspam/NanumSquare/master/nanumsquare.css');
+            * {
+                font-family: 'nanumsquare';
+            }
+        </style>
+
+        
+        {% include 'includes/preloader.html' %}
+
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.2.0/anime.min.js" integrity="sha384-BnFYVbw3PHhz5qWXTCSL12MjPc3KxjdKPx7R4R5JjIzxFmYX267NDyJ9B/nZANdg" crossorigin="anonymous"></script>
+
+
+        <!-- Hero -->
+        <div class="section-header pb-6 bg-primary text-white">
+            <div class="container">
+                <div class="row justify-content-center">
+                        
+                </div>
+            </div>
+        </div>
+        <!-- Section -->
+        <div class="section section-md">
+            <div class="container">
+                <div class="row">
+
+                    <div id="map" style="width:100%;height:550px;"></div>
+                        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=f98829d62a2f1148436a888ee0e6ad1d"></script>
+                    <script src="http://code.jquery.com/jquery-latest.js"></script>
+                    
+                    <script>
+
+                        
+
+                        var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+                        mapOption = { 
+                            center: new kakao.maps.LatLng(36.504076, 127.2494855), // 지도의 중심좌표
+                            level: 8 // 지도의 확대 레벨
+                        };
+
+                        var map = new kakao.maps.Map(mapContainer, mapOption),
+                        customOverlay = new kakao.maps.CustomOverlay({}),
+                        infowindow = new kakao.maps.InfoWindow({removable: true});
+
+                    
+
+                        $.getJSON("./static/assets/sejong2.geojson", function(geojson) {
+                                        
+                            var data = geojson.features;
+                            var coordinates = [];    //좌표 저장할 배열
+                            var name = '';            //행정동 이름
+                            
+                            $.each(data, function(index, val) {
+                            
+                                coordinates = val.geometry.coordinates;
+                                name = val.properties.EMD_NM;
+
+
+                                displayArea(coordinates, name);
+                        
+                            })
+                        
+                        })
+                        var map = new kakao.maps.Map(mapContainer, mapOption),
+                            customOverlay = new kakao.maps.CustomOverlay({}),
+                            infowindow = new kakao.maps.InfoWindow({removable: true});
+                                        
+                        var polygons=[];                //function 안 쪽에 지역변수로 넣으니깐 폴리곤 하나 생성할 때마다 배열이 비어서 클릭했을 때 전체를 못 없애줌.  그래서 전역변수로 만듦.
+    
+                        //행정구역 폴리곤
+                        function displayArea(coordinates, name) {
+                        
+                            var path = [];            //폴리곤 그려줄 path
+                            var points = [];        //중심좌표 구하기 위한 지역구 좌표들
+                            
+                            $.each(coordinates[0][0], function(index, coordinate) {        //console.log(coordinates)를 확인해보면 보면 [0]번째에 배열이 주로 저장이 됨.  그래서 [0]번째 배열에서 꺼내줌.
+                                var point = new Object(); 
+                                point.x = coordinate[1];
+                                point.y = coordinate[0];
+                                points.push(point);
+                                path.push(new kakao.maps.LatLng(coordinate[1], coordinate[0]));            //new daum.maps.LatLng가 없으면 인식을 못해서 path 배열에 추가
+                            })
+                            
+                           
+                            // 다각형을 생성합니다 
+                            var polygon = new kakao.maps.Polygon({
+                                map : map, // 다각형을 표시할 지도 객체
+                                path : path,
+                                strokeWeight : 2,
+                                strokeColor : '#004c80',
+                                strokeOpacity : 0.8,
+                                fillColor : '#fff',
+                                fillOpacity : 0.2
+                            });
+                            
+                            polygons.push(polygon);            //폴리곤 제거하기 위한 배열
+                        
+                            // 다각형에 mouseover 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 변경합니다 
+                            // 지역명을 표시하는 커스텀오버레이를 지도위에 표시합니다
+                            kakao.maps.event.addListener(polygon, 'mouseover', function(mouseEvent) {
+                                polygon.setOptions({fillColor: '#09f'});
+
+                        
+                                customOverlay.setContent('<div class="badge bg-info" >' + name + '</div>');
+                        
+                                customOverlay.setPosition(mouseEvent.latLng);
+                                customOverlay.setMap(map);
+                            });
+                        
+                            /*
+                            // 다각형에 mousemove 이벤트를 등록하고 이벤트가 발생하면 커스텀 오버레이의 위치를 변경합니다 
+                            kakao.maps.event.addListener(polygon, 'mousemove', function(mouseEvent) {
+                        
+                                customOverlay.setPosition(mouseEvent.latLng);
+                            });
+                            */
+                            // 다각형에 mouseout 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 원래색으로 변경합니다
+                            // 커스텀 오버레이를 지도에서 제거합니다 
+                            kakao.maps.event.addListener(polygon, 'mouseout', function() {
+                                polygon.setOptions({fillColor: '#fff'});
+                                customOverlay.setMap(null);
+                            });
+                            
+
+                            //다각형에 click 이벤트를 등록하고 이벤트가 발생하면 다각형의 이름과 면적을 인포윈도우에 표시합니다 
+                            /*kakao.maps.event.addListener(polygon, 'click', function(mouseEvent) {
+                                var content = '<div class="info">' + 
+                                            '   <div class="title">' + area.name + '</div>' +
+                                            '   <div class="size">총 면적 : 약 ' + Math.floor(polygon.getArea()) + ' m<sup>2</sup></div>' +
+                                            '</div>';
+
+                                infowindow.setContent(content); 
+                                infowindow.setPosition(mouseEvent.latLng); 
+                                infowindow.setMap(map);
+                            });
+                            */
+                            // 다각형에 click 이벤트를 등록하고 이벤트가 발생하면 해당 지역 확대을 확대합니다.
+                            kakao.maps.event.addListener(polygon, 'click', function() {
+
+                                $(function(){
+                                    $("#town").val(name).prop("selected", true); //해당 동을 선택된 값으로 변경
+                                });
+                                
+                                // 현재 지도 레벨에서 2레벨 확대한 레벨
+                                var level = map.getLevel()-1;
+                                
+                                // 지도를 클릭된 폴리곤의 중앙 위치를 기준으로 확대합니다
+                                map.setLevel(level, {anchor: centroid(points), animate: {
+                                    duration: 350            //확대 애니메이션 시간
+                                }});            
+                        
+                                deletePolygon(polygons);                    //폴리곤 제거 
+                                
+                                
+                                $("#town").val(name).prop("selected", true); //해당 동을 선택된 값으로 변경
+                            });
+
+                        
+
+                        }
+
+                        //centroid 알고리즘 (폴리곤 중심좌표 구하기 위함)
+                        function centroid (points) {
+                            var i, j, len, p1, p2, f, area, x, y;
+                        
+                            area = x = y = 0;
+                        
+                            for (i = 0, len = points.length, j = len - 1; i < len; j = i++) {
+                                    p1 = points[i];
+                                    p2 = points[j];
+                        
+                                    f = p1.y * p2.x - p2.y * p1.x;
+                                    x += (p1.x + p2.x) * f;
+                                    y += (p1.y + p2.y) * f;
+                                    area += f * 3;
+                            }
+                            return new daum.maps.LatLng(x / area, y / area);
+                        }
+                       
+                </script>
+            </div>
+                <br>
+
+        
+             <!-- End of Hero -->
+        
+                <!-- <div class="section section-md"> -->
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-12">
+                        <div class="mb-5">
+                            
+                            <form id="item-form" method="get" action="/predict">
+                                <div class="btn-group me-2 mb-2">
+                                    <select name='town' id='town' type="button" class="btn btn-primary">
+                                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="fas fa-angle-down dropdown-arrow"></span>
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <ul class="dropdown-menu py-0" aria-labelledby="dropdownMenu2">
+                                            <option value="none">== 행정동 선택 ==</option>
+                                            {% for i in x %}
+                                            <option  value="{{i}}">{{i}}</option>
+                                            {% endfor %}
+                                        </ul>
+                                    </select>
+                                </div>
+                            
+                                <div class="btn-group me-2 mb-2">
+                                    <select name='mclas' id='mclas' type="button" class="btn btn-primary" onchange="addressKindChange(this)">
+                                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="fas fa-angle-down dropdown-arrow"></span>
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <ul class="dropdown-menu py-0" aria-labelledby="dropdownMenu2">
+                                            <option value="none">== 중분류 선택 ==</option>
+                                            <option value="음식점 및 주점업">음식점 및 주점업</option>
+                                            <option value="소매업; 자동차 제외">소매업; 자동차 제외</option>
+                                            <option value="스포츠 및 오락관련 서비스업">스포츠 및 오락관련 서비스업</option>
+                                            <option value="기타 개인 서비스업">기타 개인 서비스업</option>
+                                            <option value="교육 서비스업">교육 서비스업</option>
+                                            <option value="개인 및 소비용품 수리업">개인 및 소비용품 수리업</option>
+                                            <option value="기타 전문 과학 및 기술 서비스업">기타 전문 과학 및 기술 서비스업</option>
+                                            <option value="자동차 및 부품 판매업">자동차 및 부품 판매업</option>
+                                            <option value="창고 및 운송관련 서비스업">창고 및 운송관련 서비스업</option>
+                                        </ul>
+                                    </select>
+                                </div>
+
+                                <div class="btn-group me-2 mb-2">
+                                    <select name='sclas' id='sclas' type="button" class="btn btn-primary">
+                                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="fas fa-angle-down dropdown-arrow"></span>
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <ul class="dropdown-menu py-0" aria-labelledby="dropdownMenu2">
+                                            <option value="none">== 소분류 선택 ==</option>
+                                           
+                                        </ul>
+                                    </select>
+                                </div class='button'>
+                                    <button class="btn btn-primary" id="check" type="submit">예측하기</button>
+                                </div>
+                            </form>
+                            <script>
+                                function addressKindChange(e) {
+                                    var m1 = ['한식 해산물 요리 전문점', '치킨 전문점', '제과점업', '간이 음식 포장 판매 전문점', '한식 일반 음식점업', '한식 면 요리 전문점', '일반 유흥 주점업', '한식 육류 요리 전문점', '기타 주점업', '피자| 햄버거| 샌드위치 및 유사 음식점업'];
+                                    var m2 = ['화장품| 비누 및 방향제 소매업', '페인트| 창호 및 기타 건설자재 소매업', '문구용품 및 회화용품 소매업', '가구 소매업', '가전제품 소매업', '신선| 냉동 및 기타 수산물 소매업', '화초 및 식물 소매업', '기타 중고 상품 소매업', '기타 음ㆍ식료품 위주 종합 소매업', '건어물 및 젓갈류 소매업', '공구 소매업', '운송장비용 주유소 운영업', '슈퍼마켓', '빵류| 과자류 및 당류 소매업', '의약품 및 의료용품 소매업', '서적| 신문 및 잡지류 소매업', '전기용품 및 조명장치 소매업', '운동 및 경기용품 소매업', '기타 대형 종합 소매업', '시계 및 귀금속 소매업', '컴퓨터 및 주변장치| 소프트웨어 소매업', '운송장비용 가스 충전업', '기타 의복 소매업', '통신기기 소매업', '육류 소매업', '그 외 기타 분류 안된 상품 전문 소매업', '애완용 동물 및 관련용품 소매업', '백화점', '철물 및 난방용구 소매업', '안경 및 렌즈 소매업', '체인화 편의점', '신발 소매업', '주방용품 및 가정용 유리| 요업제품 소매업'];
+                                    var m3 = ['골프 연습장 운영업', '골프장 운영업', '당구장 운영업', '체력 단련시설 운영업', '그 외 기타 스포츠시설 운영업', '노래 연습장 운영업']
+                                    var m4 = ['이용업', '장례식장 및 장의관련 서비스업', '두발 미용업', '욕탕업', '가정용 세탁업']
+                                    var m5 = ['일반 교과학원', '유아 교육기관', '태권도 및 무술 교육기관']
+                                    var m6 = ['자동차 세차업', '그 외 기타 개인 및 가정용품 수리업']
+                                    var m7 = ['인물 사진 및 행사용 영상 촬영업']
+                                    var m8 = ['기타 자동차 신품 부품 및 내장품 판매업']
+                                    var m9 = ['주차장 운영업']
+                    
+                    
+                                    var target = document.getElementById("sclas");
+                                
+                                    if(e.value == "음식점 및 주점업") var d = m1;
+                                    else if(e.value == "소매업; 자동차 제외") var d = m2;
+                                    else if(e.value == "스포츠 및 오락관련 서비스업") var d = m3;
+                                    else if(e.value == "기타 개인 서비스업") var d = m4;
+                                    else if(e.value == "교육 서비스업") var d = m5;
+                                    else if(e.value == "개인 및 소비용품 수리업") var d = m6;
+                                    else if(e.value == "기타 전문 과학 및 기술 서비스업") var d = m7;
+                                    else if(e.value == "자동차 및 부품 판매업") var d = m8;
+                                    else if(e.value == "창고 및 운송관련 서비스업") var d = m9;
+                                    
+                                   
+                    
+                                    target.options.length = 0;
+                                
+                                    for (x in d) {
+                                        var opt = document.createElement("option");
+                                        opt.value = d[x];
+                                        opt.innerHTML = d[x];
+                                        target.appendChild(opt);
+                                    }   
+                                }
+                                
+                            </script>
+                        </div>   
+                    </div>
+                </div>
+            </div>
+        </div>
+ 
+        
+
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

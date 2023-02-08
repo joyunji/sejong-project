@@ -1,0 +1,103 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Buttons {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+    <!--
+    <style>
+    @font-face {
+        font-family: 'RIDIBatang';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/RIDIBatang.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+    * {
+        font-family: 'RIDIBatang';
+    }
+    </style>
+-->
+        {% include 'includes/preloader.html' %}
+        <script src="http://code.jquery.com/jquery-latest.js"></script>
+
+        <!-- Hero -->
+        <div class="section-header pb-6 bg-primary text-white">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-8 text-center">
+                        <i class="fa-solid fa-magnifying-glass-dollar fa-5x"></i>
+                        <!--<i class="fa-solid fa-check fa-5x"></i>-->
+                        <!--<i class="fa-solid fa-magnifying-glass-chart fa-5x"></i>-->
+                       <br></br>
+                       <br></br>
+                       <br></br>
+                      <!--  {{ clas }} -->
+                        <h1 class="display-3 mb-4">{{ town }} <br> {{ sclas }}</h2>
+                        <p class="lead mb-5 alert bg-secondary">다음달 예상매출은 
+                            <span class="memberCountCon display-2 text-danger mb-0 " style="font-weight: bold;"></span>
+                            원 입니다.</p>
+
+                        <br>
+        
+            
+                    </div>
+                    <script>
+                        var memberCountConTxt= {{pred}};
+  
+                        $({ val : 0 }).animate({ val : memberCountConTxt }, {
+                        duration: 2000,
+                        step: function() {
+                            var num = numberWithCommas(Math.floor(this.val));
+                            $(".memberCountCon").text(num);
+                        },
+                        complete: function() {
+                            var num = numberWithCommas(Math.floor(this.val));
+                            $(".memberCountCon").text(num);
+                        }
+                        });
+
+                        function numberWithCommas(x) {
+                            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        }
+
+
+                    </script>
+
+                </div>
+
+                <div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Hero -->
+    
+
+    </main>
+    {% include 'includes/footer.html' %}
+   
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    <script>
+        $toggleTransitions = $('#toggleTransitions');
+        $buttonOverlay = $('.btn-loading-overlay');
+
+        $toggleTransitions.on('change', function() {
+            if ($(this).is(':checked')) {
+                $buttonOverlay.addClass('btn-loading');
+                $buttonOverlay.attr('disabled', true);
+            } else {
+                $buttonOverlay.removeClass('btn-loading');
+                $buttonOverlay.attr('disabled', false);
+            }
+        });
+    </script>
+
+{% endblock javascripts %}

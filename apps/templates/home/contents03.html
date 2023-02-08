@@ -1,0 +1,275 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Dropdowns {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        
+        {% include 'includes/preloader.html' %}
+
+        <!-- Hero -->
+        <div class="section-header pb-6 bg-primary text-white">
+            <div class="container">
+                <div class="row justify-content-center">
+                        
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section -->
+        <div class="section section-md">
+            <div class="container">
+                <div class="row">
+
+                    <div id="map" style="width:100%;height:550px;"></div>
+                        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=f98829d62a2f1148436a888ee0e6ad1d"></script>
+                    <script src="http://code.jquery.com/jquery-latest.js"></script>
+                    
+                    <script>
+
+                        
+
+                        var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+                        mapOption = { 
+                            center: new kakao.maps.LatLng(36.504076, 127.2494855), // 지도의 중심좌표
+                            level: 8 // 지도의 확대 레벨
+                        };
+
+                        var map = new kakao.maps.Map(mapContainer, mapOption),
+                        customOverlay = new kakao.maps.CustomOverlay({}),
+                        infowindow = new kakao.maps.InfoWindow({removable: true});
+
+                    
+
+                        $.getJSON("./static/assets/sejong2.geojson", function(geojson) {
+                                        
+                            var data = geojson.features;
+                            var coordinates = [];    //좌표 저장할 배열
+                            var name = '';            //행정동 이름
+                            
+                            $.each(data, function(index, val) {
+                            
+                                coordinates = val.geometry.coordinates;
+                                name = val.properties.EMD_NM;
+
+
+                                displayArea(coordinates, name);
+                        
+                            })
+                        
+                        })
+                        var map = new kakao.maps.Map(mapContainer, mapOption),
+                            customOverlay = new kakao.maps.CustomOverlay({}),
+                            infowindow = new kakao.maps.InfoWindow({removable: true});
+                                        
+                        var polygons=[];                //function 안 쪽에 지역변수로 넣으니깐 폴리곤 하나 생성할 때마다 배열이 비어서 클릭했을 때 전체를 못 없애줌.  그래서 전역변수로 만듦.
+    
+                        //행정구역 폴리곤
+                        function displayArea(coordinates, name) {
+                        
+                            var path = [];            //폴리곤 그려줄 path
+                            var points = [];        //중심좌표 구하기 위한 지역구 좌표들
+                            
+                            $.each(coordinates[0][0], function(index, coordinate) {        //console.log(coordinates)를 확인해보면 보면 [0]번째에 배열이 주로 저장이 됨.  그래서 [0]번째 배열에서 꺼내줌.
+                                var point = new Object(); 
+                                point.x = coordinate[1];
+                                point.y = coordinate[0];
+                                points.push(point);
+                                path.push(new kakao.maps.LatLng(coordinate[1], coordinate[0]));            //new daum.maps.LatLng가 없으면 인식을 못해서 path 배열에 추가
+                            })
+                            
+                           
+                            // 다각형을 생성합니다 
+                            var polygon = new kakao.maps.Polygon({
+                                map : map, // 다각형을 표시할 지도 객체
+                                path : path,
+                                strokeWeight : 2,
+                                strokeColor : '#004c80',
+                                strokeOpacity : 0.8,
+                                fillColor : '#fff',
+                                fillOpacity : 0.2
+                            });
+                            
+                            polygons.push(polygon);            //폴리곤 제거하기 위한 배열
+                        
+                            // 다각형에 mouseover 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 변경합니다 
+                            // 지역명을 표시하는 커스텀오버레이를 지도위에 표시합니다
+                            kakao.maps.event.addListener(polygon, 'mouseover', function(mouseEvent) {
+                                polygon.setOptions({fillColor: '#09f'});
+
+                        
+                                customOverlay.setContent('<div class="badge bg-info" >' + name + '</div>');
+                        
+                                customOverlay.setPosition(mouseEvent.latLng);
+                                customOverlay.setMap(map);
+                            });
+                        
+                            /*
+                            // 다각형에 mousemove 이벤트를 등록하고 이벤트가 발생하면 커스텀 오버레이의 위치를 변경합니다 
+                            kakao.maps.event.addListener(polygon, 'mousemove', function(mouseEvent) {
+                        
+                                customOverlay.setPosition(mouseEvent.latLng);
+                            });
+                            */
+                            // 다각형에 mouseout 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 원래색으로 변경합니다
+                            // 커스텀 오버레이를 지도에서 제거합니다 
+                            kakao.maps.event.addListener(polygon, 'mouseout', function() {
+                                polygon.setOptions({fillColor: '#fff'});
+                                customOverlay.setMap(null);
+                            });
+                            
+
+                            //다각형에 click 이벤트를 등록하고 이벤트가 발생하면 다각형의 이름과 면적을 인포윈도우에 표시합니다 
+                            /*kakao.maps.event.addListener(polygon, 'click', function(mouseEvent) {
+                                var content = '<div class="info">' + 
+                                            '   <div class="title">' + area.name + '</div>' +
+                                            '   <div class="size">총 면적 : 약 ' + Math.floor(polygon.getArea()) + ' m<sup>2</sup></div>' +
+                                            '</div>';
+
+                                infowindow.setContent(content); 
+                                infowindow.setPosition(mouseEvent.latLng); 
+                                infowindow.setMap(map);
+                            });
+                            */
+                            // 다각형에 click 이벤트를 등록하고 이벤트가 발생하면 해당 지역 확대을 확대합니다.
+                            kakao.maps.event.addListener(polygon, 'click', function() {
+
+                                $(function(){
+                                    $("#town").val(name).prop("selected", true); //해당 동을 선택된 값으로 변경
+                                });
+                                
+                                // 현재 지도 레벨에서 2레벨 확대한 레벨
+                                var level = map.getLevel()-2;
+                                
+                                // 지도를 클릭된 폴리곤의 중앙 위치를 기준으로 확대합니다
+                                map.setLevel(level, {anchor: centroid(points), animate: {
+                                    duration: 350            //확대 애니메이션 시간
+                                }});            
+                        
+                                deletePolygon(polygons);                    //폴리곤 제거 
+                                
+                                
+                                $("#town").val(name).prop("selected", true); //해당 동을 선택된 값으로 변경
+                            });
+
+                        
+
+                        }
+
+                        //centroid 알고리즘 (폴리곤 중심좌표 구하기 위함)
+                        function centroid (points) {
+                            var i, j, len, p1, p2, f, area, x, y;
+                        
+                            area = x = y = 0;
+                        
+                            for (i = 0, len = points.length, j = len - 1; i < len; j = i++) {
+                                    p1 = points[i];
+                                    p2 = points[j];
+                        
+                                    f = p1.y * p2.x - p2.y * p1.x;
+                                    x += (p1.x + p2.x) * f;
+                                    y += (p1.y + p2.y) * f;
+                                    area += f * 3;
+                            }
+                            return new daum.maps.LatLng(x / area, y / area);
+                        }
+                       
+                </script>
+            </div>
+                <br>
+        
+        <!-- End of Hero -->
+        
+        <div class="section section-md">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-12">
+                        <div class="mb-5">
+                            
+                            <form id="item-form" method="get" action="/graph">
+                                <div class="btn-group me-2 mb-2">
+                                    <select name='town' id='town' type="button" class="btn btn-primary">
+                                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="fas fa-angle-down dropdown-arrow"></span>
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <ul class="dropdown-menu py-0" aria-labelledby="dropdownMenu2">
+                                            <option value="none">== 행정동 선택 ==</option>
+                                            {% for i in x %}
+                                            <option  value="{{i}}">{{i}}</option>
+                                            {% endfor %}
+                                        </ul>
+                                    </select>
+                                </div>
+                                <div class="btn-group me-2 mb-2">
+                                </div class='button'>
+                                    <button class="btn btn-primary" id="check" type="submit">분석하기</button>
+                                </div>
+                            </form>
+                        </div>   
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <script>
+            var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+    mapOption = { 
+        center: new kakao.maps.LatLng(36.49431, 127.27623), // 지도의 중심좌표
+        level: 9 // 지도의 확대 레벨
+    };
+
+var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+// 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+var mapTypeControl = new kakao.maps.MapTypeControl();
+
+// 지도 타입 컨트롤을 지도에 표시합니다
+map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+function getInfo() {
+    // 지도의 현재 중심좌표를 얻어옵니다 
+    var center = map.getCenter(); 
+    
+    // 지도의 현재 레벨을 얻어옵니다
+    var level = map.getLevel();
+    
+    // 지도타입을 얻어옵니다
+    var mapTypeId = map.getMapTypeId(); 
+    
+    // 지도의 현재 영역을 얻어옵니다 
+    var bounds = map.getBounds();
+    
+    // 영역의 남서쪽 좌표를 얻어옵니다 
+    var swLatLng = bounds.getSouthWest(); 
+    
+    // 영역의 북동쪽 좌표를 얻어옵니다 
+    var neLatLng = bounds.getNorthEast(); 
+    
+    // 영역정보를 문자열로 얻어옵니다. ((남,서), (북,동)) 형식입니다
+    var boundsStr = bounds.toString();
+    
+    
+    var message = '지도 중심좌표는 위도 ' + center.getLat() + ', <br>';
+    message += '경도 ' + center.getLng() + ' 이고 <br>';
+    message += '지도 레벨은 ' + level + ' 입니다 <br> <br>';
+    message += '지도 타입은 ' + mapTypeId + ' 이고 <br> ';
+    message += '지도의 남서쪽 좌표는 ' + swLatLng.getLat() + ', ' + swLatLng.getLng() + ' 이고 <br>';
+    message += '북동쪽 좌표는 ' + neLatLng.getLat() + ', ' + neLatLng.getLng() + ' 입니다';
+    
+    // 개발자도구를 통해 직접 message 내용을 확인해 보세요.
+    // ex) console.log(message);
+}
+        </script>
+
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

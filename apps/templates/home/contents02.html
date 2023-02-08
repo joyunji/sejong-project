@@ -1,0 +1,156 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Dropdowns {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        
+        {% include 'includes/preloader.html' %}
+
+        <!-- Hero -->
+        <div class="section-header pb-6 bg-primary text-white">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-8 text-center">
+                        <h1 class="display-3 mb-4">카드 매출 데이터 분석</h1>
+                        <p class="lead mb-5">다음은 분기별 월별 매출액 현황과 <br>지역별 점유율 분석 <br>업종별 매출액 증감분석에 대한 내용이다.</p>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--End of Title section-->
+        <div class="section section-md">
+            <div class="container">
+                <div class="row justify-content-center mt-4">
+                    <!-- <div class="col-12 col-lg-8"> -->
+                        <!--Accordion-->
+                            <div class="container">
+                                <div class="row justify-content-center">
+                                    <div class="accordion" id="accordionExample1">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="headingOne">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                    분기별 매출액 현황 분석
+                                                </button>
+                                            </h2>
+                                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                                                data-bs-parent="#accordionExample1">
+                                                <div class="accordion-body">
+                                                    <center>
+                                                    <img src="static\assets\img\01.png" alt="My Image" loading="lazy">
+                                                    
+                                                    <h6>22년 2분기 카드 매출액은  1조 1,620억원으로 전년 동분기 대비 약 1290억(12.5%) 증가</h6>
+                                                </center>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="headingTwo">
+                                                
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                    월별 매출액 현황 분석
+                                                </button>
+                                                
+                                            </h2>
+                                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                                                data-bs-parent="#accordionExample1">
+                                                <div class="accordion-body">
+                                                    <center>
+                                                    <img src="static\assets\img\02.png" alt="My Image" loading="lazy">
+                                                    <br>
+                                                    <h6 >(21.4월) 3,550억원 ->  (22.4월) 3,845억원 : 약 295억원 8.33% 증가<br>
+
+                                                        (21.5월) 3,349억원 ->  (22.5월) 3,898억원 : 약 549억원 16.40% 증가<br>
+                                                        
+                                                        (21.6월) 3,430억원->  (22.6월) 3,874억원 : 약 444억원 12.96% 증가<br><br>
+                                                        
+                                                        ‘22년 4~6월의 매출액은 전년 동월대비 모두 상승,<br> 
+                                                        
+                                                        5월은 270억원(14.4%)로 2분기 중 가장 큰 증가
+                                                        </h6>
+                                                    </center>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="headingThree">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                    지역별 매출액 점유율 분석
+                                                </button>
+                                            </h2>
+                                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                                                data-bs-parent="#accordionExample1">
+                                                <div class="accordion-body">
+                                            
+                                                    <h5>22년 2분기 지역별 매출액 점유율 현황</h5>
+                                                    
+                                                    <center>
+                                                        <div>
+                                                            <img src="static\assets\img\03-2.png" style="width: 25vw; " alt="My Image" loading="lazy">
+                                                            <img src="static\assets\img\03-3.png" style="width: 25vw;"alt="My Image" loading="lazy">
+                                                        </div>
+                                                    </center>
+                                                    
+                                                    
+                                                    <br>
+                                                    <center>
+                                                    <h6 >22년 동지역 정유율 상위 3개<br>어진동(50.2%)<br>나성동(5.7%)<br>도담동(4.2%)</h6>
+                                                    </center>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="headingThree">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                    업종별 매출액 증감 분석
+                                                </button>
+                                            </h2>
+                                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                                                data-bs-parent="#accordionExample1">
+                                                <div class="accordion-body">
+                                                    <img src="static\assets\img\04.png" alt="My Image" loading="lazy">
+                                                </div>
+                                            </div>
+                                        </div>
+                        <!--End of Accordion-->
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+                
+        
+        <!-- End of Hero -->
+        
+        <!-- <div class="section section-md">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-12">
+                          
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        
+
+        
+
+    </main>
+    {% include 'includes/footer.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
+
