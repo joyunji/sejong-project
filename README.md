@@ -11,7 +11,7 @@
 - 시각화 : matplotlib, seaborn
 - 데이터 전처리 : numpy, pandas
 - 모델링 : sckit-learn, huber regressor
-- 웹 구현 : html, css, js, Flask, Mysql
+- 웹 구현 : html, css, js, Flask, Mysql, QGIS
 
 
 ### 개선점
