@@ -13,5 +13,3 @@
 - 모델링 : sckit-learn, huber regressor
 - 웹 구현 : html, css, js, Flask, Mysql
 
-
-## 모델 
