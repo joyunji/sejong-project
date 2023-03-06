@@ -14,6 +14,11 @@
 - 웹 구현 : html, css, js, Flask, Mysql, QGIS
 
 
+<img src='https://user-images.githubusercontent.com/49296139/223034382-e6258d62-1f27-49f3-8bee-eb5b3731cf03.png' width="400" height="300">
+
+
+
+
 ### 개선점
 
 - 구체적인 카드 매출 발생 가맹점별 위치 데이터를 확보한다면 상권기반예측으로 다양한 피처를 추가할 수 있다. (ex. 상권 종류, 업력, 지하철/버스 정류장 500m 이내 유무 등등)
