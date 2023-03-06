@@ -13,8 +13,18 @@
 - 모델링 : sckit-learn, huber regressor
 - 웹 구현 : html, css, js, Flask, Mysql, QGIS
 
+### model
+huber regressor
 
+- MAE: 9597225.586886
+- RMSE: 3578714022611885.500000
+- R2: 0.984369
+
+### web
 <img src='https://user-images.githubusercontent.com/49296139/223034382-e6258d62-1f27-49f3-8bee-eb5b3731cf03.png' width="400" height="300">
+<img src='https://user-images.githubusercontent.com/49296139/223035405-a22e7a22-b500-401d-a92d-af6c77321332.png' width="400" height="300">
+<img src='https://user-images.githubusercontent.com/49296139/223035550-1e0b8e9b-6ed2-4c1c-8546-8d7503cda9b2.png' width="400" height="300">
+
 
 
 
